@@ -2,13 +2,12 @@
 // CONFIGURE THESE CONSTANTS
 // ==========================
 
-// TODO: Replace these three values with your real Airtable details
-const AIRTABLE_BASE_ID = "appe2sseQ12piCWap";
-const AIRTABLE_TABLE_NAME = "Species"; // or your actual table name
-const AIRTABLE_API_TOKEN = "patFxptg7KKExTKfk.865f3fd44a0df3559fcbba26ef2a21e2154b42d02202968866ed8466e8ae6880";
+// Replace these with your real Airtable details:
+const AIRTABLE_BASE_ID = "appe2sseQ12piCWap";       // <- your base ID
+const AIRTABLE_TABLE_NAME = "Species";              // <- exact table name
+const AIRTABLE_API_TOKEN = "patFxptg7KKExTKfk.865f3fd44a0df3559fcbba26ef2a21e2154b42d02202968866ed8466e8ae6880";     // <- your personal access token
 
-// FRI Dehradun coordinates (approx) for map center
-// Based on public coordinate data for Forest Research Institute campus.[web:77][web:79][web:85]
+// FRI Dehradun coordinates (approx) for map center.[web:77]
 const FRI_LAT = 30.343;
 const FRI_LNG = 78.0015;
 
@@ -21,7 +20,7 @@ const map = L.map("map").setView([FRI_LAT, FRI_LNG], 16);
 // OpenStreetMap tiles (free)
 L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
   maxZoom: 19,
-  attribution: '&copy; OpenStreetMap contributors'
+  attribution: "&copy; OpenStreetMap contributors"
 }).addTo(map);
 
 // A layer group to hold tree markers
@@ -40,7 +39,7 @@ async function loadTreesFromAirtable() {
   const url =
     `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/` +
     encodeURIComponent(AIRTABLE_TABLE_NAME) +
-    `?pageSize=100&view=Grid%20view`; // adjust view name if needed[web:18][web:52][web:63]
+    `?pageSize=100&view=Grid%20view`; // use your main view name if different[web:18]
 
   try {
     const response = await fetch(url, {
@@ -55,7 +54,7 @@ async function loadTreesFromAirtable() {
     }
 
     const data = await response.json();
-    console.log("Airtable data:", data); // useful for debugging
+    console.log("Airtable data:", data); // useful to debug field names
 
     if (!data.records || !Array.isArray(data.records)) {
       console.error("Unexpected Airtable response format");
@@ -74,38 +73,48 @@ async function loadTreesFromAirtable() {
 
 function renderTrees(records) {
   const listEl = document.getElementById("tree-list");
-  listEl.innerHTML = ""; // clear existing
-
+  listEl.innerHTML = "";
   treeLayer.clearLayers();
 
   records.forEach(record => {
     const fields = record.fields || {};
 
-    const species = fields.Species || fields["Scientific name"] || "Unnamed species";
-    const family = fields.Family || "Unknown family";
-    const uses = fields.Uses || "";
-    const desc = fields.Description || "";
+    // --- Text fields from Species table ---
+    const species = fields["Botanical name"] || "Unnamed species";
+    const common  = fields["Common name"] || "";
+    const family  = fields["Family"] || "Unknown family";
+    const origin  = fields["Origin"] || "";
+    const uses    = fields["Uses"] || "";
+    const desc    = fields["Description"] || "";
 
-    // Adjust if your field names are different:
-    const lat = fields.Latitude || fields.lat || null;
-    const lng = fields.Longitude || fields.lng || null;
+    // --- Coordinates for the map ---
+    const lat = fields["Latitude"] ?? null;
+    const lng = fields["Longitude"] ?? null;
 
-    // Images: use the first attachment URL if available
+    // --- Image attachment (first image only) ---
     let imageUrl = null;
-    if (fields.Images && Array.isArray(fields.Images) && fields.Images.length > 0) {
-      imageUrl = fields.Images[0].url;
+    if (fields["Images"] && Array.isArray(fields["Images"]) && fields["Images"].length > 0) {
+      imageUrl = fields["Images"][0].url;
     }
 
-    // ---- List item ----
+    // ===== Tree list item =====
     const li = document.createElement("li");
 
     const nameEl = document.createElement("div");
     nameEl.className = "tree-name";
     nameEl.textContent = species;
 
+    const commonEl = document.createElement("div");
+    commonEl.className = "tree-common";
+    commonEl.textContent = common ? `Common name: ${common}` : "";
+
     const familyEl = document.createElement("div");
     familyEl.className = "tree-family";
-    familyEl.textContent = family;
+    familyEl.textContent = `Family: ${family}`;
+
+    const originEl = document.createElement("div");
+    originEl.className = "tree-origin";
+    originEl.textContent = origin ? `Origin: ${origin}` : "";
 
     const usesEl = document.createElement("div");
     usesEl.className = "tree-uses";
@@ -116,7 +125,9 @@ function renderTrees(records) {
     descEl.textContent = desc;
 
     li.appendChild(nameEl);
+    if (common) li.appendChild(commonEl);
     li.appendChild(familyEl);
+    if (origin) li.appendChild(originEl);
     if (uses) li.appendChild(usesEl);
     if (desc) li.appendChild(descEl);
 
@@ -132,13 +143,15 @@ function renderTrees(records) {
 
     listEl.appendChild(li);
 
-    // ---- Map marker ----
+    // ===== Map marker =====
     if (lat != null && lng != null) {
       const marker = L.marker([lat, lng]);
       const popupHtml = `
         <strong>${species}</strong><br/>
-        ${family}<br/>
-        ${uses ? `<em>${uses}</em><br/>` : ""}
+        ${common ? common + "<br/>" : ""}
+        Family: ${family}<br/>
+        ${origin ? "Origin: " + origin + "<br/>" : ""}
+        ${uses ? "<em>" + uses + "</em>" : ""}
       `;
       marker.bindPopup(popupHtml);
       marker.addTo(treeLayer);
