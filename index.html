@@ -2,14 +2,13 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>FRI Campus Tree Field Guide</title>
 
-  <!-- Leaflet CSS (map library) -->
+  <!-- Leaflet CSS (no integrity, no crossorigin to avoid blocking) -->
   <link
     rel="stylesheet"
     href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-    integrity="sha256-o9N1j7kGStGkLz2p3bZkG6qJbPeLr3yLx3lNfQx3A+o="
-    crossorigin=""
   />
 
   <!-- Our stylesheet -->
@@ -24,25 +23,25 @@
   <main>
     <section id="map-section">
       <h2>Campus Map</h2>
+      <!-- This div ID must match script.js (L.map('map')) -->
       <div id="map"></div>
     </section>
 
     <section id="list-section">
       <h2>Tree Species List</h2>
       <p>Data loaded directly from Airtable.</p>
+      <!-- This UL ID must match script.js (document.getElementById('tree-list')) -->
       <ul id="tree-list"></ul>
     </section>
   </main>
 
   <footer>
-    <p>Powered by Airtable & Leaflet • Hosted on GitHub Pages</p>
+    <p>Powered by Airtable &amp; Leaflet &bull; Hosted on GitHub Pages</p>
   </footer>
 
-  <!-- Leaflet JS -->
+  <!-- Leaflet JS (no integrity, no crossorigin) -->
   <script
     src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-    integrity="sha256-o9mYHqO+1lLRsC1sZkI3uj1+f4W0jCw9n9m1Jdhp3Wc="
-    crossorigin=""
   ></script>
 
   <!-- Our script -->
