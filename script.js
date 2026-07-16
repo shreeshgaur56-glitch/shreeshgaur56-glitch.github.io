@@ -3,9 +3,9 @@
 // ==========================
 
 // TODO: Replace these three values with your real Airtable details
-const AIRTABLE_BASE_ID = "REPLACE_WITH_YOUR_BASE_ID";
-const AIRTABLE_TABLE_NAME = "Trees"; // or your actual table name
-const AIRTABLE_API_TOKEN = "REPLACE_WITH_YOUR_API_TOKEN";
+const AIRTABLE_BASE_ID = "appe2sseQ12piCWap";
+const AIRTABLE_TABLE_NAME = "Species"; // or your actual table name
+const AIRTABLE_API_TOKEN = "patFxptg7KKExTKfk.865f3fd44a0df3559fcbba26ef2a21e2154b42d02202968866ed8466e8ae6880";
 
 // FRI Dehradun coordinates (approx) for map center
 // Based on public coordinate data for Forest Research Institute campus.[web:77][web:79][web:85]
