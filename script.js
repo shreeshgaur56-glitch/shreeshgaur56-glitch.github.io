@@ -5,7 +5,7 @@
 // Replace these with your real Airtable details:
 const AIRTABLE_BASE_ID = "appe2sseQ12piCWap";       // <- your base ID
 const AIRTABLE_TABLE_NAME = "Species";              // <- exact table name
-const AIRTABLE_API_TOKEN = "patiysPaIj0gnWUYq.8627ea24b24d535b322cc4ee21560544b85ee108370375ad4228bbb4c0bf5fc3";     // <- your personal access token
+const AIRTABLE_API_TOKEN = "patme1XZdQghYiGd4.b637eb7325e461d04863f06d75dc2732074b1ab27459f5f950bed2812f37cb40";     // <- your personal access token
 
 // FRI Dehradun coordinates (approx) for map center.[web:77]
 const FRI_LAT = 30.343;
