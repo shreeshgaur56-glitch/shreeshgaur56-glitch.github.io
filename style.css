@@ -1,6 +1,6 @@
-/* =========================
+/* ================
    Base styles
-   ========================= */
+   ================ */
 
 *,
 *::before,
@@ -21,27 +21,9 @@ body {
   line-height: 1.6;
 }
 
-/* Layout helpers */
-
-main {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 1rem 2rem;
-}
-
-.section {
-  padding: 2rem 0;
-}
-
-.section-inner {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
-
-/* =========================
-   Header & navigation
-   ========================= */
+/* ================
+   Header & nav
+   ================ */
 
 .site-header {
   position: sticky;
@@ -93,29 +75,99 @@ main {
 
 .site-nav {
   display: flex;
-  gap: 0.75rem;
   flex-wrap: wrap;
+  gap: 0.5rem;
 }
 
-.site-nav a {
-  text-decoration: none;
-  font-size: 0.95rem;
-  color: #01696f;
-  padding: 0.35rem 0.75rem;
-  border-radius: 999px;
+.nav-link {
   border: 1px solid transparent;
+  border-radius: 999px;
+  padding: 0.35rem 0.9rem;
+  font-size: 0.9rem;
+  background-color: #fbfbf9;
+  color: #01696f;
+  cursor: pointer;
   transition: background-color 0.18s ease, border-color 0.18s ease,
     color 0.18s ease;
 }
 
-.site-nav a:hover {
+.nav-link:hover {
   background-color: #cedcd8;
   border-color: #01696f;
 }
 
-/* =========================
+.nav-link.active {
+  background-color: #01696f;
+  color: #f9f8f4;
+}
+
+/* ================
+   Page sections
+   ================ */
+
+main {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem 2rem;
+}
+
+/* "Pages" – only one visible at a time */
+.page-section {
+  display: none;
+}
+
+.page-section.active-page {
+  display: block;
+}
+
+/* Generic sections */
+
+.section {
+  padding: 2rem 0;
+}
+
+.section-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+/* ================
+   Hero
+   ================ */
+
+.section-hero .hero-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.hero-image img {
+  width: 100%;
+  height: auto;
+  border-radius: 14px;
+  border: 1px solid #d4d1ca;
+  object-fit: cover;
+}
+
+.hero-content h2 {
+  margin: 0 0 0.5rem;
+}
+
+.hero-content p {
+  margin: 0 0 0.75rem;
+  color: #444;
+}
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+/* ================
    Buttons
-   ========================= */
+   ================ */
 
 .btn {
   display: inline-flex;
@@ -153,70 +205,44 @@ main {
   background-color: #e6e4df;
 }
 
-/* =========================
-   Home section
-   ========================= */
+/* ================
+   Biodiversity + intro
+   ================ */
 
-.section-home .section-inner {
+.section-biodiversity h3,
+.section-intro h3 {
+  margin: 0;
+}
+
+.section-biodiversity p,
+.section-intro p {
+  margin: 0;
+  color: #444;
+}
+
+/* ================
+   Feedback form
+   ================ */
+
+.feedback-layout {
   flex-direction: row;
   align-items: flex-start;
   gap: 2rem;
 }
 
-.home-main {
-  flex: 2;
+.feedback-text {
+  flex: 1.2;
 }
 
-.home-aside {
-  flex: 1.2;
+.feedback-form-wrapper {
+  flex: 1.3;
+}
+
+.feedback-form {
   background-color: #fbfbf9;
   border-radius: 12px;
   border: 1px solid #d4d1ca;
   padding: 1rem 1.25rem;
-}
-
-.home-stats {
-  margin: 1.2rem 0;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
-}
-
-.stat-card {
-  min-width: 160px;
-  padding: 0.75rem 1rem;
-  border-radius: 10px;
-  background-color: #fbfbf9;
-  border: 1px solid #dcd9d5;
-}
-
-.stat-label {
-  font-size: 0.85rem;
-  color: #555;
-}
-
-.stat-value {
-  margin-top: 0.25rem;
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: #01696f;
-}
-
-.home-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-  margin-bottom: 1.25rem;
-}
-
-.home-how h3 {
-  margin-top: 1.5rem;
-  margin-bottom: 0.5rem;
-}
-
-/* Feedback form */
-
-.feedback-form {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
@@ -240,39 +266,45 @@ main {
 }
 
 .feedback-note {
-  margin-top: 0.75rem;
+  margin: 0.25rem 0 0;
   font-size: 0.8rem;
   color: #666;
 }
 
-/* =========================
-   Explore Trees section
-   ========================= */
+/* ================
+   Gallery
+   ================ */
 
-.section-explore .section-header h2 {
-  margin-bottom: 0.25rem;
-}
-
-.section-explore .section-header p {
+.section-gallery p {
   margin: 0;
-  color: #555;
+  color: #444;
 }
 
-.explore-controls {
-  display: flex;
-  flex-wrap: wrap;
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 0.75rem;
 }
 
-.explore-controls input,
-.explore-controls select {
-  flex: 1;
-  min-width: 180px;
-  padding: 0.4rem 0.5rem;
-  border-radius: 999px;
-  border: 1px solid #dcd9d5;
-  font: inherit;
-  background-color: #fbfbf9;
+.gallery-grid img {
+  width: 100%;
+  height: auto;
+  border-radius: 12px;
+  border: 1px solid #d4d1ca;
+  object-fit: cover;
+}
+
+/* ================
+   Explore Trees page
+   ================ */
+
+.section-explore-header h2 {
+  margin: 0;
+}
+
+.section-explore-header p {
+  margin: 0;
+  color: #555;
 }
 
 /* Species cards */
@@ -281,7 +313,7 @@ main {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
   gap: 1rem;
-  margin-top: 1rem;
+  margin-top: 0.5rem;
 }
 
 .species-card {
@@ -332,15 +364,15 @@ main {
   height: auto;
 }
 
-/* =========================
-   Map section
-   ========================= */
+/* ================
+   Map page
+   ================ */
 
-.section-map .section-header h2 {
-  margin-bottom: 0.25rem;
+.section-map-header h2 {
+  margin: 0;
 }
 
-.section-map .section-header p {
+.section-map-header p {
   margin: 0;
   color: #555;
 }
@@ -353,15 +385,13 @@ main {
   overflow: hidden;
 }
 
-/* Leaflet default container adjustments */
-
 .leaflet-container {
   font: inherit;
 }
 
-/* =========================
+/* ================
    Footer
-   ========================= */
+   ================ */
 
 .site-footer {
   padding: 1rem 1.5rem;
@@ -372,21 +402,17 @@ main {
   color: #555;
 }
 
-/* =========================
-   Responsive tweaks
-   ========================= */
+/* ================
+   Responsive
+   ================ */
 
 @media (max-width: 768px) {
-  .section-home .section-inner {
-    flex-direction: column;
-  }
-
   .site-header-inner {
     flex-direction: column;
     align-items: flex-start;
   }
 
-  .site-nav {
-    justify-content: flex-start;
+  .feedback-layout {
+    flex-direction: column;
   }
 }
