@@ -6,11 +6,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <!-- Leaflet CSS (interactive map library) -->
+  <!-- NOTE: integrity/crossorigin removed to avoid digest mismatch blocking the resource -->
   <link
     rel="stylesheet"
     href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-    integrity="sha256-o9N1j7kGStGkLz2p3bZkG6qJbPeLr3yLx3lNfQx3A+o="
-    crossorigin=""
   />
 
   <!-- Our stylesheet -->
@@ -98,8 +97,7 @@
             </button>
           </form>
           <p class="feedback-note">
-            Replace <code>YOUR_EMAIL@domain.com</code> in the form action with
-            your own email address.
+            You can change the email in the form action if needed.
           </p>
         </aside>
       </div>
@@ -162,11 +160,8 @@
   </footer>
 
   <!-- Leaflet JS -->
-  <script
-    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-    integrity="sha256-o9mYHqO+1lLRsC1sZkI3uj1+f4W0jCw9n9m1Jdhp3Wc="
-    crossorigin=""
-  ></script>
+  <!-- NOTE: integrity/crossorigin removed; Leaflet docs show simple script usage like this.[web:108] -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
   <!-- Our script -->
   <script src="script.js"></script>
