@@ -7,18 +7,16 @@
 // 2. Set AIRTABLE_TABLE_NAME to your table name (e.g. "Trees").
 // 3. Set AIRTABLE_API_TOKEN to your personal access token with read-only access.
 //
-// If you don't remember them, open your previous script.js in another tab
-// and copy the values from there.
+// Copy these from the working version you had earlier.
 
 const AIRTABLE_BASE_ID = "appe2sseQ12piCWap";
-const AIRTABLE_TABLE_NAME = "Species"; // replace with your actual table name
+const AIRTABLE_TABLE_NAME = "Species"; // exact table name
 const AIRTABLE_API_TOKEN = "patme1XZdQghYiGd4.b637eb7325e461d04863f06d75dc2732074b1ab27459f5f950bed2812f37cb40";
 
 // Approximate FRI campus coordinates for map center.[web:77][web:79][web:85]
 const FRI_LAT = 30.343;
 const FRI_LNG = 78.0015;
 
-// We'll store records globally so future phases (filters, detail view) can reuse them.
 let allRecords = [];
 
 // ==========================
@@ -27,7 +25,6 @@ let allRecords = [];
 
 const map = L.map("map").setView([FRI_LAT, FRI_LNG], 16);
 
-// OpenStreetMap tiles (free).[web:108]
 L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
   maxZoom: 19,
   attribution: "&copy; OpenStreetMap contributors"
@@ -48,7 +45,7 @@ async function loadTreesFromAirtable() {
   const url =
     `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/` +
     encodeURIComponent(AIRTABLE_TABLE_NAME) +
-    `?pageSize=100&view=Grid%20view`; // adjust "Grid view" if your main view has another name.[web:18][web:52][web:63]
+    `?pageSize=100&view=Grid%20view`; // adjust view name if needed.[web:18][web:52][web:63]
 
   try {
     const response = await fetch(url, {
@@ -64,7 +61,6 @@ async function loadTreesFromAirtable() {
 
     const data = await response.json();
     console.log("Airtable data:", data);
-
     if (!data.records || !Array.isArray(data.records)) {
       console.error("Unexpected Airtable response format");
       return;
@@ -72,7 +68,6 @@ async function loadTreesFromAirtable() {
 
     allRecords = data.records;
 
-    setSpeciesCount(allRecords);
     renderSpeciesCards(allRecords);
     renderMapMarkers(allRecords);
   } catch (err) {
@@ -81,13 +76,12 @@ async function loadTreesFromAirtable() {
 }
 
 // ==========================
-// Helpers: extract fields
+// Field extraction helper
 // ==========================
 
 function getFields(record) {
   const fields = record.fields || {};
 
-  // Adjust these mappings if your Airtable field names differ.
   const species =
     fields.Species ||
     fields["Scientific name"] ||
@@ -107,7 +101,7 @@ function getFields(record) {
   const origin =
     fields.Origin ||
     fields["Origin category"] ||
-    ""; // e.g., "Native" or "Exotic"
+    "";
 
   const uses =
     fields.Uses ||
@@ -131,7 +125,6 @@ function getFields(record) {
     fields.lng ||
     null;
 
-  // First image from an attachment field
   let imageUrl = null;
   if (fields.Images && Array.isArray(fields.Images) && fields.Images.length > 0) {
     imageUrl = fields.Images[0].url;
@@ -154,24 +147,7 @@ function getFields(record) {
 }
 
 // ==========================
-// Species count on Home page
-// ==========================
-
-function setSpeciesCount(records) {
-  const countEl = document.getElementById("species-count");
-  if (!countEl) return;
-
-  const uniqueSpecies = new Set();
-  records.forEach(record => {
-    const { species } = getFields(record);
-    uniqueSpecies.add(species);
-  });
-
-  countEl.textContent = uniqueSpecies.size.toString();
-}
-
-// ==========================
-// Render species cards
+// Render species cards (Explore page)
 // ==========================
 
 function renderSpeciesCards(records) {
@@ -194,7 +170,6 @@ function renderSpeciesCards(records) {
     const card = document.createElement("article");
     card.className = "species-card";
 
-    // Header: names + family
     const header = document.createElement("div");
     header.className = "species-card-header";
 
@@ -212,7 +187,6 @@ function renderSpeciesCards(records) {
     header.appendChild(familyEl);
     card.appendChild(header);
 
-    // Origin (Native/Exotic)
     if (origin) {
       const originEl = document.createElement("div");
       originEl.className = "species-origin";
@@ -220,7 +194,6 @@ function renderSpeciesCards(records) {
       card.appendChild(originEl);
     }
 
-    // Uses
     if (uses) {
       const usesEl = document.createElement("div");
       usesEl.className = "species-uses";
@@ -228,7 +201,6 @@ function renderSpeciesCards(records) {
       card.appendChild(usesEl);
     }
 
-    // Description
     if (desc) {
       const descEl = document.createElement("div");
       descEl.className = "species-desc";
@@ -236,7 +208,6 @@ function renderSpeciesCards(records) {
       card.appendChild(descEl);
     }
 
-    // Image
     if (imageUrl) {
       const imgEl = document.createElement("img");
       imgEl.className = "species-image";
@@ -250,7 +221,7 @@ function renderSpeciesCards(records) {
 }
 
 // ==========================
-// Render map markers
+// Render map markers (Map page)
 // ==========================
 
 function renderMapMarkers(records) {
@@ -267,9 +238,7 @@ function renderMapMarkers(records) {
       lng
     } = getFields(record);
 
-    if (lat == null || lng == null) {
-      return;
-    }
+    if (lat == null || lng == null) return;
 
     const marker = L.marker([lat, lng]);
 
@@ -286,9 +255,73 @@ function renderMapMarkers(records) {
 }
 
 // ==========================
+// Page switching (Home / Explore / Map)
+// ==========================
+
+function showPage(pageName) {
+  const sections = document.querySelectorAll(".page-section");
+  sections.forEach(sec => {
+    sec.classList.remove("active-page");
+  });
+
+  const target = document.getElementById(`page-${pageName}`);
+  if (target) {
+    target.classList.add("active-page");
+  }
+
+  const navLinks = document.querySelectorAll(".nav-link");
+  navLinks.forEach(btn => {
+    btn.classList.toggle("active", btn.dataset.page === pageName);
+  });
+}
+
+// ==========================
+// Feedback form (temporary behavior)
+// ==========================
+
+function initSuggestionForm() {
+  const form = document.getElementById("suggestion-form");
+  if (!form) return;
+
+  form.addEventListener("submit", event => {
+    event.preventDefault();
+    const formData = new FormData(form);
+    const name = formData.get("name");
+    const message = formData.get("message");
+
+    console.log("Suggestion submitted:", { name, message });
+    alert("Thank you for your suggestion! (It is logged in the browser console for now.)");
+
+    form.reset();
+  });
+}
+
+// ==========================
 // Initialize on page load
 // ==========================
 
 document.addEventListener("DOMContentLoaded", () => {
+  // default page: home
+  showPage("home");
+
+  // nav buttons
+  document.querySelectorAll(".nav-link").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const page = btn.dataset.page;
+      showPage(page);
+    });
+  });
+
+  // hero buttons
+  const btnExplore = document.getElementById("btn-explore");
+  const btnMap = document.getElementById("btn-map");
+  if (btnExplore) {
+    btnExplore.addEventListener("click", () => showPage("explore"));
+  }
+  if (btnMap) {
+    btnMap.addEventListener("click", () => showPage("map"));
+  }
+
+  initSuggestionForm();
   loadTreesFromAirtable();
 });
