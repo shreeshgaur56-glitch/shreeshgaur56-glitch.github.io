@@ -2,46 +2,170 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>FRI Campus Tree Field Guide</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <!-- Leaflet CSS (no integrity, no crossorigin to avoid blocking) -->
+  <!-- Leaflet CSS (interactive map library) -->
   <link
     rel="stylesheet"
     href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-o9N1j7kGStGkLz2p3bZkG6qJbPeLr3yLx3lNfQx3A+o="
+    crossorigin=""
   />
 
   <!-- Our stylesheet -->
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <header>
-    <h1>FRI Campus Tree Field Guide</h1>
-    <p>Explore tree species across Forest Research Institute, Dehradun.</p>
+  <!-- Site header + navigation -->
+  <header class="site-header">
+    <div class="site-header-inner">
+      <div class="site-title">
+        <span class="site-logo">FRI</span>
+        <div class="site-text">
+          <h1>FRI Campus Tree Field Guide</h1>
+          <p>Dynamic biodiversity information system for ICFRE–FRI campus.</p>
+        </div>
+      </div>
+      <nav class="site-nav">
+        <a href="#home">Home</a>
+        <a href="#explore">Explore Trees</a>
+        <a href="#map-page">Species Map</a>
+      </nav>
+    </div>
   </header>
 
   <main>
-    <section id="map-section">
-      <h2>Campus Map</h2>
-      <!-- This div ID must match script.js (L.map('map')) -->
-      <div id="map"></div>
+    <!-- HOME SECTION -->
+    <section id="home" class="section section-home">
+      <div class="section-inner">
+        <div class="home-main">
+          <h2>Welcome to FRI Biodiversity</h2>
+          <p>
+            This platform provides concise information on tree species of the
+            ICFRE–FRI campus in Dehradun, including taxonomy, uses, and
+            locations on an interactive map.
+          </p>
+
+          <div class="home-stats">
+            <div class="stat-card">
+              <div class="stat-label">Tree species in database</div>
+              <div class="stat-value" id="species-count">–</div>
+            </div>
+          </div>
+
+          <div class="home-actions">
+            <a href="#explore" class="btn btn-primary">Explore Trees</a>
+            <a href="#map-page" class="btn btn-secondary">Open Species Map</a>
+          </div>
+
+          <div class="home-how">
+            <h3>How this website works</h3>
+            <p>
+              Data are managed in a structured Airtable base and displayed here
+              as species cards and map markers. As new species and locations are
+              added to the database, the website updates automatically.
+            </p>
+          </div>
+        </div>
+
+        <aside class="home-aside">
+          <h3>Suggestions & Feedback</h3>
+          <p>
+            If you have suggestions, corrections, or additional species records
+            to contribute, you can send a brief message using the form below.
+          </p>
+          <form
+            class="feedback-form"
+            action="mailto:shreeshgaur56@gmail.com"
+            method="post"
+            enctype="text/plain"
+          >
+            <label>
+              Your name
+              <input type="text" name="name" required />
+            </label>
+            <label>
+              Your email
+              <input type="email" name="email" required />
+            </label>
+            <label>
+              Message
+              <textarea name="message" rows="4" required></textarea>
+            </label>
+            <button type="submit" class="btn btn-primary">
+              Send feedback
+            </button>
+          </form>
+          <p class="feedback-note">
+            Replace <code>YOUR_EMAIL@domain.com</code> in the form action with
+            your own email address.
+          </p>
+        </aside>
+      </div>
     </section>
 
-    <section id="list-section">
-      <h2>Tree Species List</h2>
-      <p>Data loaded directly from Airtable.</p>
-      <!-- This UL ID must match script.js (document.getElementById('tree-list')) -->
-      <ul id="tree-list"></ul>
+    <!-- EXPLORE TREES SECTION -->
+    <section id="explore" class="section section-explore">
+      <div class="section-inner">
+        <header class="section-header">
+          <h2>Explore Trees</h2>
+          <p>
+            Browse tree species recorded on the FRI campus. Each card shows
+            family, origin, and key uses.
+          </p>
+        </header>
+
+        <!-- Search + filters (Phase 2 will wire these; for now just layout) -->
+        <div class="explore-controls">
+          <input
+            type="text"
+            id="search-input"
+            placeholder="Search by common or botanical name (coming later)"
+            disabled
+          />
+          <select id="family-filter" disabled>
+            <option value="">Filter by family (coming later)</option>
+          </select>
+          <select id="origin-filter" disabled>
+            <option value="">Filter by origin (Native/Exotic – coming later)</option>
+          </select>
+        </div>
+
+        <!-- Species cards -->
+        <div id="species-cards" class="species-cards">
+          <!-- Cards are injected by script.js -->
+        </div>
+      </div>
+    </section>
+
+    <!-- SPECIES MAP SECTION -->
+    <section id="map-page" class="section section-map">
+      <div class="section-inner">
+        <header class="section-header">
+          <h2>Species Map</h2>
+          <p>
+            Interactive map of FRI campus showing tree locations. Click markers
+            for quick species information.
+          </p>
+        </header>
+
+        <div id="map" class="map-container"></div>
+      </div>
     </section>
   </main>
 
-  <footer>
-    <p>Powered by Airtable &amp; Leaflet &bull; Hosted on GitHub Pages</p>
+  <footer class="site-footer">
+    <p>
+      Powered by Airtable &amp; Leaflet • Hosted on GitHub Pages • Prototype Phase 1
+    </p>
   </footer>
 
-  <!-- Leaflet JS (no integrity, no crossorigin) -->
+  <!-- Leaflet JS -->
   <script
     src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-o9mYHqO+1lLRsC1sZkI3uj1+f4W0jCw9n9m1Jdhp3Wc="
+    crossorigin=""
   ></script>
 
   <!-- Our script -->
