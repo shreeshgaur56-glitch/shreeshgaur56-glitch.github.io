@@ -6,7 +6,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <!-- Leaflet CSS (interactive map library) -->
-  <!-- NOTE: integrity/crossorigin removed to avoid digest mismatch blocking the resource -->
   <link
     rel="stylesheet"
     href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
@@ -27,140 +26,201 @@
         </div>
       </div>
       <nav class="site-nav">
-        <a href="#home">Home</a>
-        <a href="#explore">Explore Trees</a>
-        <a href="#map-page">Species Map</a>
+        <button class="nav-link" data-page="home">Home</button>
+        <button class="nav-link" data-page="explore">Explore Trees</button>
+        <button class="nav-link" data-page="map">Campus Map</button>
       </nav>
     </div>
   </header>
 
   <main>
-    <!-- HOME SECTION -->
-    <section id="home" class="section section-home">
-      <div class="section-inner">
-        <div class="home-main">
-          <h2>Welcome to FRI Biodiversity</h2>
-          <p>
-            This platform provides concise information on tree species of the
-            ICFRE–FRI campus in Dehradun, including taxonomy, uses, and
-            locations on an interactive map.
-          </p>
-
-          <div class="home-stats">
-            <div class="stat-card">
-              <div class="stat-label">Tree species in database</div>
-              <div class="stat-value" id="species-count">–</div>
+    <!-- ======================
+         HOME "PAGE"
+         ====================== -->
+    <section id="page-home" class="page-section">
+      <!-- Hero with FRI main building -->
+      <section class="section section-hero">
+        <div class="hero-inner">
+          <div class="hero-image">
+            <!-- Replace src with your actual FRI main building image URL -->
+            <img
+              src="https://picsum.photos/seed/fri-building/1200/500"
+              alt="Forest Research Institute main building"
+            />
+          </div>
+          <div class="hero-content">
+            <h2>Forest Research Institute, Dehradun</h2>
+            <p>
+              A historic campus hosting rich tree diversity across avenues,
+              plantations, and natural stands. This field guide helps you
+              explore and understand the woody flora of the FRI campus.
+            </p>
+            <div class="hero-actions">
+              <button id="btn-explore" class="btn btn-primary">
+                Explore Trees
+              </button>
+              <button id="btn-map" class="btn btn-secondary">
+                Campus Map
+              </button>
             </div>
           </div>
+        </div>
+      </section>
 
-          <div class="home-actions">
-            <a href="#explore" class="btn btn-primary">Explore Trees</a>
-            <a href="#map-page" class="btn btn-secondary">Open Species Map</a>
-          </div>
+      <!-- Biodiversity information of FRI campus -->
+      <section class="section section-biodiversity">
+        <div class="section-inner">
+          <h3>Biodiversity of the FRI Campus</h3>
+          <p>
+            The ICFRE–FRI campus represents a living collection of indigenous and
+            exotic tree species maintained for research, education, and
+            conservation. Avenue plantations, experimental plots, arboreta and
+            natural patches together capture a broad spectrum of forest types
+            and functional groups.
+          </p>
+          <p>
+            Species documented here include timber trees, non-timber forest
+            produce species, shade and ornamental trees, and ecologically
+            important species that support local wildlife and ecosystem
+            processes.
+          </p>
+        </div>
+      </section>
 
-          <div class="home-how">
-            <h3>How this website works</h3>
+      <!-- Project description + invitation for suggestions -->
+      <section class="section section-intro">
+        <div class="section-inner">
+          <h3>About this project</h3>
+          <p>
+            This website is a working prototype of a campus biodiversity
+            information system. It is being refined step by step, and many
+            species, images and location records are still being added.
+          </p>
+          <p>
+            You are invited to share corrections, missing species, better
+            photographs, and any ideas that can improve the usefulness of this
+            field guide for students, teachers and researchers.
+          </p>
+        </div>
+      </section>
+
+      <!-- Suggestion form: name + message only -->
+      <section class="section section-feedback">
+        <div class="section-inner feedback-layout">
+          <div class="feedback-text">
+            <h3>Share your suggestions</h3>
             <p>
-              Data are managed in a structured Airtable base and displayed here
-              as species cards and map markers. As new species and locations are
-              added to the database, the website updates automatically.
+              Use the form to send your feedback. Please include your name and a
+              clear description of the improvement or correction you suggest.
             </p>
           </div>
+          <div class="feedback-form-wrapper">
+            <!-- No email; we just capture name + message.
+                 To actually send/store these, you’ll later connect a backend or form service. -->
+            <form id="suggestion-form" class="feedback-form">
+              <label>
+                Name
+                <input type="text" name="name" required />
+              </label>
+              <label>
+                Your suggestion
+                <textarea name="message" rows="4" required></textarea>
+              </label>
+              <button type="submit" class="btn btn-primary">
+                Submit suggestion
+              </button>
+              <p class="feedback-note">
+                For now, suggestions are not stored permanently. In the next
+                phase, we will connect this form to a backend or Airtable table.
+              </p>
+            </form>
+          </div>
         </div>
+      </section>
 
-        <aside class="home-aside">
-          <h3>Suggestions & Feedback</h3>
+      <!-- Simple gallery: trees and leaves -->
+      <section class="section section-gallery">
+        <div class="section-inner">
+          <h3>Tree & Leaf Gallery (sample)</h3>
           <p>
-            If you have suggestions, corrections, or additional species records
-            to contribute, you can send a brief message using the form below.
+            A few glimpses of the woody flora. Replace these sample images with
+            your own photographs from the FRI campus.
           </p>
-          <form
-            class="feedback-form"
-            action="mailto:shreeshgaur56@gmail.com"
-            method="post"
-            enctype="text/plain"
-          >
-            <label>
-              Your name
-              <input type="text" name="name" required />
-            </label>
-            <label>
-              Your email
-              <input type="email" name="email" required />
-            </label>
-            <label>
-              Message
-              <textarea name="message" rows="4" required></textarea>
-            </label>
-            <button type="submit" class="btn btn-primary">
-              Send feedback
-            </button>
-          </form>
-          <p class="feedback-note">
-            You can change the email in the form action if needed.
-          </p>
-        </aside>
-      </div>
+          <div class="gallery-grid">
+            <!-- Replace each src with your real images -->
+            <img
+              src="https://picsum.photos/seed/fri-tree1/400/260"
+              alt="Tree canopy"
+            />
+            <img
+              src="https://picsum.photos/seed/fri-tree2/400/260"
+              alt="Tree trunk and bark"
+            />
+            <img
+              src="https://picsum.photos/seed/fri-leaf1/400/260"
+              alt="Leaves close-up"
+            />
+            <img
+              src="https://picsum.photos/seed/fri-leaf2/400/260"
+              alt="Foliage pattern"
+            />
+          </div>
+        </div>
+      </section>
     </section>
 
-    <!-- EXPLORE TREES SECTION -->
-    <section id="explore" class="section section-explore">
-      <div class="section-inner">
-        <header class="section-header">
+    <!-- ======================
+         EXPLORE TREES "PAGE"
+         ====================== -->
+    <section id="page-explore" class="page-section">
+      <section class="section section-explore-header">
+        <div class="section-inner">
           <h2>Explore Trees</h2>
           <p>
-            Browse tree species recorded on the FRI campus. Each card shows
-            family, origin, and key uses.
+            Browse tree species documented on the FRI campus. Data are loaded
+            directly from the Airtable biodiversity base.
           </p>
-        </header>
-
-        <!-- Search + filters (Phase 2 will wire these; for now just layout) -->
-        <div class="explore-controls">
-          <input
-            type="text"
-            id="search-input"
-            placeholder="Search by common or botanical name (coming later)"
-            disabled
-          />
-          <select id="family-filter" disabled>
-            <option value="">Filter by family (coming later)</option>
-          </select>
-          <select id="origin-filter" disabled>
-            <option value="">Filter by origin (Native/Exotic – coming later)</option>
-          </select>
         </div>
+      </section>
 
-        <!-- Species cards -->
-        <div id="species-cards" class="species-cards">
-          <!-- Cards are injected by script.js -->
+      <section class="section section-explore-list">
+        <div class="section-inner">
+          <div id="species-cards" class="species-cards">
+            <!-- Cards injected by script.js -->
+          </div>
         </div>
-      </div>
+      </section>
     </section>
 
-    <!-- SPECIES MAP SECTION -->
-    <section id="map-page" class="section section-map">
-      <div class="section-inner">
-        <header class="section-header">
-          <h2>Species Map</h2>
+    <!-- ======================
+         CAMPUS MAP "PAGE"
+         ====================== -->
+    <section id="page-map" class="page-section">
+      <section class="section section-map-header">
+        <div class="section-inner">
+          <h2>Campus Map</h2>
           <p>
-            Interactive map of FRI campus showing tree locations. Click markers
-            for quick species information.
+            Interactive map showing tree locations across the FRI campus.
+            Click markers for quick species information.
           </p>
-        </header>
+        </div>
+      </section>
 
-        <div id="map" class="map-container"></div>
-      </div>
+      <section class="section section-map-main">
+        <div class="section-inner">
+          <div id="map" class="map-container"></div>
+        </div>
+      </section>
     </section>
   </main>
 
   <footer class="site-footer">
     <p>
-      Powered by Airtable &amp; Leaflet • Hosted on GitHub Pages • Prototype Phase 1
+      Powered by Airtable &amp; Leaflet • Hosted on GitHub Pages • Prototype Field Guide
     </p>
   </footer>
 
-  <!-- Leaflet JS -->
-  <!-- NOTE: integrity/crossorigin removed; Leaflet docs show simple script usage like this.[web:108] -->
+  <!-- Leaflet JS (no integrity to avoid digest mismatch issues)[web:108] -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
   <!-- Our script -->
