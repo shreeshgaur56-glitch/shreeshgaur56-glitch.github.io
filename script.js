@@ -1,33 +1,42 @@
 // ==========================
-// CONFIGURE THESE CONSTANTS
+// Airtable configuration
 // ==========================
+//
+// IMPORTANT:
+// 1. Set AIRTABLE_BASE_ID to your base's ID (starts with "app...").
+// 2. Set AIRTABLE_TABLE_NAME to your table name (e.g. "Trees").
+// 3. Set AIRTABLE_API_TOKEN to your personal access token with read-only access.
+//
+// If you don't remember them, open your previous script.js in another tab
+// and copy the values from there.
 
-// Replace these with your real Airtable details:
-const AIRTABLE_BASE_ID = "appe2sseQ12piCWap";       // <- your base ID
-const AIRTABLE_TABLE_NAME = "Species";              // <- exact table name
-const AIRTABLE_API_TOKEN = "patme1XZdQghYiGd4.b637eb7325e461d04863f06d75dc2732074b1ab27459f5f950bed2812f37cb40";     // <- your personal access token
+const AIRTABLE_BASE_ID = "appe2sseQ12piCWap";
+const AIRTABLE_TABLE_NAME = "Species"; // replace with your actual table name
+const AIRTABLE_API_TOKEN = "patme1XZdQghYiGd4.b637eb7325e461d04863f06d75dc2732074b1ab27459f5f950bed2812f37cb40";
 
-// FRI Dehradun coordinates (approx) for map center.[web:77]
+// Approximate FRI campus coordinates for map center.[web:77][web:79][web:85]
 const FRI_LAT = 30.343;
 const FRI_LNG = 78.0015;
 
+// We'll store records globally so future phases (filters, detail view) can reuse them.
+let allRecords = [];
+
 // ==========================
-// LEAFLET MAP SETUP
+// Leaflet map setup
 // ==========================
 
 const map = L.map("map").setView([FRI_LAT, FRI_LNG], 16);
 
-// OpenStreetMap tiles (free)
+// OpenStreetMap tiles (free).[web:108]
 L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
   maxZoom: 19,
   attribution: "&copy; OpenStreetMap contributors"
 }).addTo(map);
 
-// A layer group to hold tree markers
 const treeLayer = L.layerGroup().addTo(map);
 
 // ==========================
-// LOAD DATA FROM AIRTABLE
+// Airtable fetch
 // ==========================
 
 async function loadTreesFromAirtable() {
@@ -39,7 +48,7 @@ async function loadTreesFromAirtable() {
   const url =
     `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/` +
     encodeURIComponent(AIRTABLE_TABLE_NAME) +
-    `?pageSize=100&view=Grid%20view`; // use your main view name if different[web:18]
+    `?pageSize=100&view=Grid%20view`; // adjust "Grid view" if your main view has another name.[web:18][web:52][web:63]
 
   try {
     const response = await fetch(url, {
@@ -54,112 +63,232 @@ async function loadTreesFromAirtable() {
     }
 
     const data = await response.json();
-    console.log("Airtable data:", data); // useful to debug field names
+    console.log("Airtable data:", data);
 
     if (!data.records || !Array.isArray(data.records)) {
       console.error("Unexpected Airtable response format");
       return;
     }
 
-    renderTrees(data.records);
+    allRecords = data.records;
+
+    setSpeciesCount(allRecords);
+    renderSpeciesCards(allRecords);
+    renderMapMarkers(allRecords);
   } catch (err) {
     console.error("Error fetching from Airtable:", err);
   }
 }
 
 // ==========================
-// RENDER TREE LIST & MARKERS
+// Helpers: extract fields
 // ==========================
 
-function renderTrees(records) {
-  const listEl = document.getElementById("tree-list");
-  listEl.innerHTML = "";
-  treeLayer.clearLayers();
+function getFields(record) {
+  const fields = record.fields || {};
+
+  // Adjust these mappings if your Airtable field names differ.
+  const species =
+    fields.Species ||
+    fields["Scientific name"] ||
+    fields["Species name"] ||
+    "Unnamed species";
+
+  const family =
+    fields.Family ||
+    fields["Botanical family"] ||
+    "Unknown family";
+
+  const commonName =
+    fields["Common name"] ||
+    fields["Common Name"] ||
+    "";
+
+  const origin =
+    fields.Origin ||
+    fields["Origin category"] ||
+    ""; // e.g., "Native" or "Exotic"
+
+  const uses =
+    fields.Uses ||
+    fields["Tree uses"] ||
+    "";
+
+  const desc =
+    fields.Description ||
+    fields.Notes ||
+    "";
+
+  const lat =
+    fields.Latitude ||
+    fields.Lat ||
+    fields.lat ||
+    null;
+
+  const lng =
+    fields.Longitude ||
+    fields.Lng ||
+    fields.lng ||
+    null;
+
+  // First image from an attachment field
+  let imageUrl = null;
+  if (fields.Images && Array.isArray(fields.Images) && fields.Images.length > 0) {
+    imageUrl = fields.Images[0].url;
+  }
+  if (!imageUrl && fields.Photos && Array.isArray(fields.Photos) && fields.Photos.length > 0) {
+    imageUrl = fields.Photos[0].url;
+  }
+
+  return {
+    species,
+    family,
+    commonName,
+    origin,
+    uses,
+    desc,
+    lat,
+    lng,
+    imageUrl
+  };
+}
+
+// ==========================
+// Species count on Home page
+// ==========================
+
+function setSpeciesCount(records) {
+  const countEl = document.getElementById("species-count");
+  if (!countEl) return;
+
+  const uniqueSpecies = new Set();
+  records.forEach(record => {
+    const { species } = getFields(record);
+    uniqueSpecies.add(species);
+  });
+
+  countEl.textContent = uniqueSpecies.size.toString();
+}
+
+// ==========================
+// Render species cards
+// ==========================
+
+function renderSpeciesCards(records) {
+  const container = document.getElementById("species-cards");
+  if (!container) return;
+
+  container.innerHTML = "";
 
   records.forEach(record => {
-    const fields = record.fields || {};
+    const {
+      species,
+      family,
+      commonName,
+      origin,
+      uses,
+      desc,
+      imageUrl
+    } = getFields(record);
 
-    // --- Text fields from Species table ---
-    const species = fields["Botanical name"] || "Unnamed species";
-    const common  = fields["Common name"] || "";
-    const family  = fields["Family"] || "Unknown family";
-    const origin  = fields["Origin"] || "";
-    const uses    = fields["Uses"] || "";
-    const desc    = fields["Description"] || "";
+    const card = document.createElement("article");
+    card.className = "species-card";
 
-    // --- Coordinates for the map ---
-    const lat = fields["Latitude"] ?? null;
-    const lng = fields["Longitude"] ?? null;
-
-    // --- Image attachment (first image only) ---
-    let imageUrl = null;
-    if (fields["Images"] && Array.isArray(fields["Images"]) && fields["Images"].length > 0) {
-      imageUrl = fields["Images"][0].url;
-    }
-
-    // ===== Tree list item =====
-    const li = document.createElement("li");
+    // Header: names + family
+    const header = document.createElement("div");
+    header.className = "species-card-header";
 
     const nameEl = document.createElement("div");
-    nameEl.className = "tree-name";
-    nameEl.textContent = species;
-
-    const commonEl = document.createElement("div");
-    commonEl.className = "tree-common";
-    commonEl.textContent = common ? `Common name: ${common}` : "";
+    nameEl.className = "species-name";
+    nameEl.textContent = commonName
+      ? `${commonName} (${species})`
+      : species;
 
     const familyEl = document.createElement("div");
-    familyEl.className = "tree-family";
-    familyEl.textContent = `Family: ${family}`;
+    familyEl.className = "species-family";
+    familyEl.textContent = family;
 
-    const originEl = document.createElement("div");
-    originEl.className = "tree-origin";
-    originEl.textContent = origin ? `Origin: ${origin}` : "";
+    header.appendChild(nameEl);
+    header.appendChild(familyEl);
+    card.appendChild(header);
 
-    const usesEl = document.createElement("div");
-    usesEl.className = "tree-uses";
-    usesEl.textContent = uses ? `Uses: ${uses}` : "";
+    // Origin (Native/Exotic)
+    if (origin) {
+      const originEl = document.createElement("div");
+      originEl.className = "species-origin";
+      originEl.textContent = origin;
+      card.appendChild(originEl);
+    }
 
-    const descEl = document.createElement("div");
-    descEl.className = "tree-desc";
-    descEl.textContent = desc;
+    // Uses
+    if (uses) {
+      const usesEl = document.createElement("div");
+      usesEl.className = "species-uses";
+      usesEl.textContent = `Uses: ${uses}`;
+      card.appendChild(usesEl);
+    }
 
-    li.appendChild(nameEl);
-    if (common) li.appendChild(commonEl);
-    li.appendChild(familyEl);
-    if (origin) li.appendChild(originEl);
-    if (uses) li.appendChild(usesEl);
-    if (desc) li.appendChild(descEl);
+    // Description
+    if (desc) {
+      const descEl = document.createElement("div");
+      descEl.className = "species-desc";
+      descEl.textContent = desc;
+      card.appendChild(descEl);
+    }
 
+    // Image
     if (imageUrl) {
       const imgEl = document.createElement("img");
+      imgEl.className = "species-image";
       imgEl.src = imageUrl;
       imgEl.alt = species;
-      imgEl.style.maxWidth = "200px";
-      imgEl.style.display = "block";
-      imgEl.style.marginTop = "0.5rem";
-      li.appendChild(imgEl);
+      card.appendChild(imgEl);
     }
 
-    listEl.appendChild(li);
-
-    // ===== Map marker =====
-    if (lat != null && lng != null) {
-      const marker = L.marker([lat, lng]);
-      const popupHtml = `
-        <strong>${species}</strong><br/>
-        ${common ? common + "<br/>" : ""}
-        Family: ${family}<br/>
-        ${origin ? "Origin: " + origin + "<br/>" : ""}
-        ${uses ? "<em>" + uses + "</em>" : ""}
-      `;
-      marker.bindPopup(popupHtml);
-      marker.addTo(treeLayer);
-    }
+    container.appendChild(card);
   });
 }
 
-// Kick off data loading when page loads
+// ==========================
+// Render map markers
+// ==========================
+
+function renderMapMarkers(records) {
+  treeLayer.clearLayers();
+
+  records.forEach(record => {
+    const {
+      species,
+      family,
+      commonName,
+      origin,
+      uses,
+      lat,
+      lng
+    } = getFields(record);
+
+    if (lat == null || lng == null) {
+      return;
+    }
+
+    const marker = L.marker([lat, lng]);
+
+    const popupLines = [];
+    popupLines.push(`<strong>${species}</strong>`);
+    if (commonName) popupLines.push(commonName);
+    popupLines.push(family);
+    if (origin) popupLines.push(origin);
+    if (uses) popupLines.push(`<em>${uses}</em>`);
+
+    marker.bindPopup(popupLines.join("<br/>"));
+    marker.addTo(treeLayer);
+  });
+}
+
+// ==========================
+// Initialize on page load
+// ==========================
+
 document.addEventListener("DOMContentLoaded", () => {
   loadTreesFromAirtable();
 });
